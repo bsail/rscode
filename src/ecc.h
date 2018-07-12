@@ -79,6 +79,8 @@ struct rscode_driver {
   int genPoly[MAXDEG*2];
   /* Encoder parity bytes */
   int pBytes[MAXDEG];
+  /* Decoder syndrome bytes */
+  int synBytes[MAXDEG];
 };
 
 void rscode_init(struct rscode_driver * driver);

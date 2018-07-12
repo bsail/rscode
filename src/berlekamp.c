@@ -141,7 +141,7 @@ Modified_Berlekamp_Massey (struct rscode_driver * driver)
 	
   for (n = NErasures; n < NPAR; n++) {
 	
-    d = compute_discrepancy(driver, psi, synBytes, L, n);
+    d = compute_discrepancy(driver, psi, driver->synBytes, L, n);
 		
     if (d != 0) {
 		
@@ -170,7 +170,7 @@ Modified_Berlekamp_Massey (struct rscode_driver * driver)
 	
 }
 
-/* given Psi (called Lambda in Modified_Berlekamp_Massey) and synBytes,
+/* given Psi (called Lambda in Modified_Berlekamp_Massey) and driver->synBytes,
    compute the combined erasure/error evaluator polynomial as 
    Psi*S mod z^4
   */
@@ -180,7 +180,7 @@ compute_modified_omega (struct rscode_driver * driver)
   int i;
   int product[MAXDEG*2];
 	
-  mult_polys(driver, product, Lambda, synBytes);	
+  mult_polys(driver, product, Lambda, driver->synBytes);	
   zero_poly(driver, Omega);
   for(i = 0; i < NPAR; i++) Omega[i] = product[i];
 

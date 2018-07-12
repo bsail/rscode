@@ -34,9 +34,6 @@
 #include "galois.h"
 #include "berlekamp.h"
 
-/* Decoder syndrome bytes */
-int synBytes[MAXDEG];
-
 static void
 compute_genpoly (struct rscode_driver * driver, int nbytes, int * genpoly);
 
@@ -78,7 +75,7 @@ print_syndrome (struct rscode_driver * driver)
   int i;
   printf("Syndrome Bytes: ");
   for (i = 0; i < NPAR; i++) 
-    printf("[%d]:%x, ",i,synBytes[i]);
+    printf("[%d]:%x, ",i,driver->synBytes[i]);
   printf("\n");
 }
 
@@ -113,7 +110,7 @@ decode_data(struct rscode_driver * driver, unsigned char * data, int nbytes)
     for (i = 0; i < nbytes; i++) {
       sum = data[i] ^ gmult(driver, driver->gexp[j+1], sum);
     }
-    synBytes[j]  = sum;
+    driver->synBytes[j]  = sum;
   }
 }
 
@@ -124,7 +121,7 @@ check_syndrome (struct rscode_driver * driver)
 {
  int i, nz = 0;
  for (i =0 ; i < NPAR; i++) {
-  if (synBytes[i] != 0) {
+  if (driver->synBytes[i] != 0) {
       nz = 1;
       break;
   }
@@ -141,7 +138,7 @@ debug_check_syndrome (struct rscode_driver * driver)
 	
   for (i = 0; i < 3; i++) {
     printf(" inv log S[%d]/S[%d] = %d\n", i, i+1, 
-	   glog[gmult(driver, synBytes[i], ginv(driver, synBytes[i+1]))]);
+	   glog[gmult(driver, driver->synBytes[i], ginv(driver, driver->synBytes[i+1]))]);
   }
 }
 

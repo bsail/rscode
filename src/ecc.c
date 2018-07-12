@@ -2,9 +2,11 @@
 #include "ecc.h"
 #include "rs.h"
 #include "berlekamp.h"
+#include <string.h>
 
 void rscode_init(struct rscode_driver * driver)
 {
+  memset(driver,0,sizeof(struct rscode_driver));
   initialize_ecc (driver);
 }
 

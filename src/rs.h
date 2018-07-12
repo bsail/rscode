@@ -13,12 +13,6 @@ extern "C" {
 #endif
 #endif
 
-/* Decoder syndrome bytes */
-int synBytes[MAXDEG];
-
-/* Encoder parity bytes */
-int pBytes[MAXDEG];
-
 /* Reed Solomon encode/decode routines */
 void initialize_ecc (struct rscode_driver * driver);
 int check_syndrome (struct rscode_driver * driver);
