@@ -45,6 +45,12 @@
 #ifndef _ECC_H
 #define _ECC_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <inttypes.h>
+
 #define NPAR 16
 
 /****************************************************************/
@@ -52,11 +58,11 @@
 /* print debugging info */
 // #define DEBUG 1
 
-#define TRUE 1
-#define FALSE 0
+#define TRUE  (1)
+#define FALSE (0)
 
-typedef unsigned long BIT32;
-typedef unsigned short BIT16;
+typedef uint32_t BIT32;
+typedef uint16_t BIT16;
 
 /* **************************************************************** */
 
@@ -68,5 +74,9 @@ typedef unsigned short BIT16;
 void rscode_init(void);
 void rscode_encode(unsigned char *msg, int nbytes, unsigned char *dst);
 int rscode_decode(unsigned char *data, int nbytes);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _ECC_H */

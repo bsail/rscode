@@ -1,3 +1,4 @@
+#define RSCODE_FLIR_INTERNAL
 #include "ecc.h"
 #include "rs.h"
 #include "berlekamp.h"

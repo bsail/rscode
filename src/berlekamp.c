@@ -35,6 +35,7 @@
  *
  */
 
+#define RSCODE_FLIR_INTERNAL
 #ifdef DEBUG
 #include <stdio.h>
 #endif

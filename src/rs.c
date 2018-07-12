@@ -24,6 +24,8 @@
  *
  * Source code is available at http://rscode.sourceforge.net
  */
+
+#define RSCODE_FLIR_INTERNAL
 #ifdef DEBUG
 #include <stdio.h>
 #endif

@@ -30,7 +30,7 @@
  *
  ******************************/
  
- 
+#define RSCODE_FLIR_INTERNAL
 #include "ecc.h"
 
 BIT16 crchware(BIT16 data, BIT16 genpoly, BIT16 accum);

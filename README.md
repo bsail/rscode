@@ -1,4 +1,4 @@
-RSCODE version 1.3-bsail0.0
+RSCODE version 1.3-bsail-0.1
 ===============
 
 [![Build Status](https://img.shields.io/travis/bsail/rscode/master.svg)](https://travis-ci.org/bsail/rscode)
