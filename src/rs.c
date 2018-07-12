@@ -24,8 +24,9 @@
  *
  * Source code is available at http://rscode.sourceforge.net
  */
-
+#ifdef DEBUG
 #include <stdio.h>
+#endif
 #include <ctype.h>
 #include "ecc.h"
 #include "galois.h"
@@ -40,10 +41,8 @@ int synBytes[MAXDEG];
 /* generator polynomial */
 int genPoly[MAXDEG*2];
 
-int DEBUG = FALSE;
-
 static void
-compute_genpoly (int nbytes, int genpoly[]);
+compute_genpoly (int nbytes, int * genpoly);
 
 /* Initialize lookup tables, polynomials, etc. */
 void
@@ -57,11 +56,13 @@ initialize_ecc ()
 }
 
 void
-zero_fill_from (unsigned char buf[], int from, int to)
+zero_fill_from (unsigned char * buf, int from, int to)
 {
   int i;
   for (i = from; i < to; i++) buf[i] = 0;
 }
+
+#ifdef DEBUG
 
 /* debugging routines */
 void
@@ -85,9 +86,11 @@ print_syndrome (void)
   printf("\n");
 }
 
+#endif
+
 /* Append the parity bytes onto the end of the message */
 void
-build_codeword (unsigned char msg[], int nbytes, unsigned char dst[])
+build_codeword (unsigned char * msg, int nbytes, unsigned char * dst)
 {
   int i;
 	
@@ -106,7 +109,7 @@ build_codeword (unsigned char msg[], int nbytes, unsigned char dst[])
  */
  
 void
-decode_data(unsigned char data[], int nbytes)
+decode_data(unsigned char * data, int nbytes)
 {
   int i, j, sum;
   for (j = 0; j < NPAR;  j++) {
@@ -133,6 +136,7 @@ check_syndrome (void)
  return nz;
 }
 
+#ifdef DEBUG
 
 void
 debug_check_syndrome (void)
@@ -145,6 +149,7 @@ debug_check_syndrome (void)
   }
 }
 
+#endif
 
 /* Create a generator polynomial for an n byte RS code. 
  * The coefficients are returned in the genPoly arg.
@@ -153,7 +158,7 @@ debug_check_syndrome (void)
  */
 
 static void
-compute_genpoly (int nbytes, int genpoly[])
+compute_genpoly (int nbytes, int * genpoly)
 {
   int i, tp[256], tp1[256];
 	
@@ -181,7 +186,7 @@ compute_genpoly (int nbytes, int genpoly[])
  */
 
 void
-encode_data (unsigned char msg[], int nbytes, unsigned char dst[])
+encode_data (unsigned char *msg, int nbytes, unsigned char *dst)
 {
   int i, LFSR[NPAR+1],dbyte, j;
 	

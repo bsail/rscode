@@ -45,9 +45,12 @@
 #ifndef _ECC_H
 #define _ECC_H
 
-#define NPAR 4
+#define NPAR 16
 
 /****************************************************************/
+
+/* print debugging info */
+// #define DEBUG 1
 
 #define TRUE 1
 #define FALSE 0
@@ -61,5 +64,9 @@ typedef unsigned short BIT16;
 #define MAXDEG (NPAR*2)
 
 /*************************************/
+
+void rscode_init(void);
+void rscode_encode(unsigned char *msg, int nbytes, unsigned char *dst);
+int rscode_decode(unsigned char *data, int nbytes);
 
 #endif /* _ECC_H */
