@@ -77,6 +77,8 @@ struct rscode_driver {
   int glog[256];
   /* generator polynomial */
   int genPoly[MAXDEG*2];
+  /* Encoder parity bytes */
+  int pBytes[MAXDEG];
 };
 
 void rscode_init(struct rscode_driver * driver);

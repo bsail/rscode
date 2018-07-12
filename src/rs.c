@@ -34,9 +34,6 @@
 #include "galois.h"
 #include "berlekamp.h"
 
-/* Encoder parity bytes */
-int pBytes[MAXDEG];
-
 /* Decoder syndrome bytes */
 int synBytes[MAXDEG];
 
@@ -70,7 +67,7 @@ print_parity (struct rscode_driver * driver)
   int i;
   printf("Parity Bytes: ");
   for (i = 0; i < NPAR; i++) 
-    printf("[%d]:%x, ",i,pBytes[i]);
+    printf("[%d]:%x, ",i,driver->pBytes[i]);
   printf("\n");
 }
 
@@ -96,7 +93,7 @@ build_codeword (struct rscode_driver * driver, unsigned char * msg, int nbytes, 
   for (i = 0; i < nbytes; i++) dst[i] = msg[i];
 	
   for (i = 0; i < NPAR; i++) {
-    dst[i+nbytes] = pBytes[NPAR-1-i];
+    dst[i+nbytes] = driver->pBytes[NPAR-1-i];
   }
 }
 	
@@ -179,7 +176,7 @@ compute_genpoly (struct rscode_driver * driver, int nbytes, int * genpoly)
 /* Simulate a LFSR with generator polynomial for n byte RS code. 
  * Pass in a pointer to the data array, and amount of data. 
  *
- * The parity bytes are deposited into pBytes[], and the whole message
+ * The parity bytes are deposited into driver->pBytes[], and the whole message
  * and parity are copied to dest to make a codeword.
  * 
  */
@@ -200,7 +197,7 @@ encode_data (struct rscode_driver * driver, unsigned char *msg, int nbytes, unsi
   }
 
   for (i = 0; i < NPAR; i++) 
-    pBytes[i] = LFSR[i];
+    driver->pBytes[i] = LFSR[i];
 	
   build_codeword(driver, msg, nbytes, dst);
 }
