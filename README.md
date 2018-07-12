@@ -1,4 +1,10 @@
-RSCODE version 1.3
+RSCODE version 1.3-bsail0.0
+===============
+
+[![Build Status](https://img.shields.io/travis/bsail/flir-lepton-command-c/master.svg)](https://travis-ci.org/bsail/flir-lepton-command-c)
+[![Coverage Status](https://img.shields.io/coveralls/github/bsail/flir-lepton-command-c/master.svg)](https://coveralls.io/github/bsail/flir-lepton-command-c?branch=master)
+
+Fork of original library by [Henry Minsky](https://github.com/hqm/rscode).
 
 See the files
 
