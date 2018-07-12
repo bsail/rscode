@@ -40,9 +40,6 @@ int pBytes[MAXDEG];
 /* Decoder syndrome bytes */
 int synBytes[MAXDEG];
 
-/* generator polynomial */
-int genPoly[MAXDEG*2];
-
 static void
 compute_genpoly (struct rscode_driver * driver, int nbytes, int * genpoly);
 
@@ -54,7 +51,7 @@ initialize_ecc (struct rscode_driver * driver)
     init_galois_tables(driver);
 
     /* Compute the encoder generator polynomial */
-    compute_genpoly(driver, NPAR, genPoly);
+    compute_genpoly(driver, NPAR, driver->genPoly);
 }
 
 void
@@ -154,8 +151,8 @@ debug_check_syndrome (struct rscode_driver * driver)
 #endif
 
 /* Create a generator polynomial for an n byte RS code. 
- * The coefficients are returned in the genPoly arg.
- * Make sure that the genPoly array which is passed in is 
+ * The coefficients are returned in the driver->genPoly arg.
+ * Make sure that the driver->genPoly array which is passed in is 
  * at least n+1 bytes long.
  */
 
@@ -197,9 +194,9 @@ encode_data (struct rscode_driver * driver, unsigned char *msg, int nbytes, unsi
   for (i = 0; i < nbytes; i++) {
     dbyte = msg[i] ^ LFSR[NPAR-1];
     for (j = NPAR-1; j > 0; j--) {
-      LFSR[j] = LFSR[j-1] ^ gmult(driver, genPoly[j], dbyte);
+      LFSR[j] = LFSR[j-1] ^ gmult(driver, driver->genPoly[j], dbyte);
     }
-    LFSR[0] = gmult(driver, genPoly[0], dbyte);
+    LFSR[0] = gmult(driver, driver->genPoly[0], dbyte);
   }
 
   for (i = 0; i < NPAR; i++) 
