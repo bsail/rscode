@@ -44,21 +44,21 @@ int synBytes[MAXDEG];
 int genPoly[MAXDEG*2];
 
 static void
-compute_genpoly (int nbytes, int * genpoly);
+compute_genpoly (struct rscode_driver * driver, int nbytes, int * genpoly);
 
 /* Initialize lookup tables, polynomials, etc. */
 void
-initialize_ecc ()
+initialize_ecc (struct rscode_driver * driver)
 {
   /* Initialize the galois field arithmetic tables */
-    init_galois_tables();
+    init_galois_tables(driver);
 
     /* Compute the encoder generator polynomial */
-    compute_genpoly(NPAR, genPoly);
+    compute_genpoly(driver, NPAR, genPoly);
 }
 
 void
-zero_fill_from (unsigned char * buf, int from, int to)
+zero_fill_from (struct rscode_driver * driver, unsigned char * buf, int from, int to)
 {
   int i;
   for (i = from; i < to; i++) buf[i] = 0;
@@ -68,7 +68,7 @@ zero_fill_from (unsigned char * buf, int from, int to)
 
 /* debugging routines */
 void
-print_parity (void)
+print_parity (struct rscode_driver * driver)
 { 
   int i;
   printf("Parity Bytes: ");
@@ -79,7 +79,7 @@ print_parity (void)
 
 
 void
-print_syndrome (void)
+print_syndrome (struct rscode_driver * driver)
 { 
   int i;
   printf("Syndrome Bytes: ");
@@ -92,7 +92,7 @@ print_syndrome (void)
 
 /* Append the parity bytes onto the end of the message */
 void
-build_codeword (unsigned char * msg, int nbytes, unsigned char * dst)
+build_codeword (struct rscode_driver * driver, unsigned char * msg, int nbytes, unsigned char * dst)
 {
   int i;
 	
@@ -111,13 +111,13 @@ build_codeword (unsigned char * msg, int nbytes, unsigned char * dst)
  */
  
 void
-decode_data(unsigned char * data, int nbytes)
+decode_data(struct rscode_driver * driver, unsigned char * data, int nbytes)
 {
   int i, j, sum;
   for (j = 0; j < NPAR;  j++) {
     sum	= 0;
     for (i = 0; i < nbytes; i++) {
-      sum = data[i] ^ gmult(gexp[j+1], sum);
+      sum = data[i] ^ gmult(driver, driver->gexp[j+1], sum);
     }
     synBytes[j]  = sum;
   }
@@ -126,7 +126,7 @@ decode_data(unsigned char * data, int nbytes)
 
 /* Check if the syndrome is zero */
 int
-check_syndrome (void)
+check_syndrome (struct rscode_driver * driver)
 {
  int i, nz = 0;
  for (i =0 ; i < NPAR; i++) {
@@ -141,13 +141,13 @@ check_syndrome (void)
 #ifdef DEBUG
 
 void
-debug_check_syndrome (void)
+debug_check_syndrome (struct rscode_driver * driver)
 {	
   int i;
 	
   for (i = 0; i < 3; i++) {
     printf(" inv log S[%d]/S[%d] = %d\n", i, i+1, 
-	   glog[gmult(synBytes[i], ginv(synBytes[i+1]))]);
+	   glog[gmult(driver, synBytes[i], ginv(driver, synBytes[i+1]))]);
   }
 }
 
@@ -160,22 +160,22 @@ debug_check_syndrome (void)
  */
 
 static void
-compute_genpoly (int nbytes, int * genpoly)
+compute_genpoly (struct rscode_driver * driver, int nbytes, int * genpoly)
 {
   int i, tp[256], tp1[256];
 	
   /* multiply (x + a^n) for n = 1 to nbytes */
 
-  zero_poly(tp1);
+  zero_poly(driver, tp1);
   tp1[0] = 1;
 
   for (i = 1; i <= nbytes; i++) {
-    zero_poly(tp);
-    tp[0] = gexp[i];		/* set up x+a^n */
+    zero_poly(driver, tp);
+    tp[0] = driver->gexp[i];		/* set up x+a^n */
     tp[1] = 1;
 	  
-    mult_polys(genpoly, tp, tp1);
-    copy_poly(tp1, genpoly);
+    mult_polys(driver, genpoly, tp, tp1);
+    copy_poly(driver, tp1, genpoly);
   }
 }
 
@@ -188,7 +188,7 @@ compute_genpoly (int nbytes, int * genpoly)
  */
 
 void
-encode_data (unsigned char *msg, int nbytes, unsigned char *dst)
+encode_data (struct rscode_driver * driver, unsigned char *msg, int nbytes, unsigned char *dst)
 {
   int i, LFSR[NPAR+1],dbyte, j;
 	
@@ -197,14 +197,14 @@ encode_data (unsigned char *msg, int nbytes, unsigned char *dst)
   for (i = 0; i < nbytes; i++) {
     dbyte = msg[i] ^ LFSR[NPAR-1];
     for (j = NPAR-1; j > 0; j--) {
-      LFSR[j] = LFSR[j-1] ^ gmult(genPoly[j], dbyte);
+      LFSR[j] = LFSR[j-1] ^ gmult(driver, genPoly[j], dbyte);
     }
-    LFSR[0] = gmult(genPoly[0], dbyte);
+    LFSR[0] = gmult(driver, genPoly[0], dbyte);
   }
 
   for (i = 0; i < NPAR; i++) 
     pBytes[i] = LFSR[i];
 	
-  build_codeword(msg, nbytes, dst);
+  build_codeword(driver, msg, nbytes, dst);
 }
 

@@ -25,6 +25,7 @@ void test_ecc_should_work_simple(void)
 {
   uint8_t length = LENGTH;
   time_t t;
+  struct rscode_driver driver;
 
   unsigned char codeword[256];
   unsigned char newword[256];
@@ -38,9 +39,9 @@ void test_ecc_should_work_simple(void)
 
   srand((unsigned) time(&t));
  
-  rscode_init();
+  rscode_init(&driver);
   /* Encode data into codeword, adding NPAR parity bytes */
-  rscode_encode(msg, length, codeword);
+  rscode_encode(&driver, msg, length, codeword);
 
   printf("Encoded message: ");
   for(int i=0;i<length;++i)
@@ -65,7 +66,7 @@ void test_ecc_should_work_simple(void)
     printf("%c",newword[i]);
   printf("\n");
 
-  TEST_ASSERT_NOT_EQUAL(0,rscode_decode(newword, ML));
+  TEST_ASSERT_NOT_EQUAL(0,rscode_decode(&driver, newword, ML));
 
   printf("Decoded message: ");
   for(int i=0;i<length;++i)

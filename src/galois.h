@@ -13,13 +13,9 @@ extern "C" {
 #endif
 #endif
 
-/* galois arithmetic tables */
-int gexp[512];
-int glog[256];;
-
-void init_galois_tables (void);
-int gmult(int a, int b);
-int ginv(int elt);
+void init_galois_tables (struct rscode_driver * driver);
+int gmult(struct rscode_driver * driver, int a, int b);
+int ginv(struct rscode_driver * driver, int elt);
 
 #ifdef __cplusplus
 }

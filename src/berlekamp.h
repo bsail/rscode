@@ -14,16 +14,16 @@ extern "C" {
 #endif
 
 /* polynomial arithmetic */
-void copy_poly(int dst[], int src[]);
+void copy_poly(struct rscode_driver * driver, int dst[], int src[]);
 
-void add_polys(int dst[], int src[]) ;
-void scale_poly(int k, int poly[]);
-void mult_polys(int dst[], int p1[], int p2[]);
+void add_polys(struct rscode_driver * driver, int dst[], int src[]) ;
+void scale_poly(struct rscode_driver * driver, int k, int poly[]);
+void mult_polys(struct rscode_driver * driver, int dst[], int p1[], int p2[]);
 
-void zero_poly(int poly[]);
+void zero_poly(struct rscode_driver * driver, int poly[]);
 
 /* Error location routines */
-int correct_errors_erasures (unsigned char codeword[], int csize,int nerasures, int erasures[]);
+int correct_errors_erasures (struct rscode_driver * driver, unsigned char codeword[], int csize,int nerasures, int erasures[]);
 
 #ifdef __cplusplus
 }

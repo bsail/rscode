@@ -20,10 +20,10 @@ int synBytes[MAXDEG];
 int pBytes[MAXDEG];
 
 /* Reed Solomon encode/decode routines */
-void initialize_ecc (void);
-int check_syndrome (void);
-void decode_data (unsigned char *data, int nbytes);
-void encode_data (unsigned char *msg, int nbytes, unsigned char *dst);
+void initialize_ecc (struct rscode_driver * driver);
+int check_syndrome (struct rscode_driver * driver);
+void decode_data (struct rscode_driver * driver, unsigned char *data, int nbytes);
+void encode_data (struct rscode_driver * driver, unsigned char *msg, int nbytes, unsigned char *dst);
 
 #ifdef __cplusplus
 }

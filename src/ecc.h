@@ -71,9 +71,15 @@ typedef uint16_t BIT16;
 
 /*************************************/
 
-void rscode_init(void);
-void rscode_encode(unsigned char *msg, int nbytes, unsigned char *dst);
-int rscode_decode(unsigned char *data, int nbytes);
+struct rscode_driver {
+/* galois arithmetic tables */
+  int gexp[512];
+  int glog[256];
+};
+
+void rscode_init(struct rscode_driver * driver);
+void rscode_encode(struct rscode_driver * driver, unsigned char *msg, int nbytes, unsigned char *dst);
+int rscode_decode(struct rscode_driver * driver, unsigned char *data, int nbytes);
 
 #ifdef __cplusplus
 }

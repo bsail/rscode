@@ -50,32 +50,32 @@ static int Lambda[MAXDEG];
 static int Omega[MAXDEG];
 
 /* local ANSI declarations */
-static int compute_discrepancy(int lambda[], int S[], int L, int n);
-static void init_gamma(int gamma[]);
-static void compute_modified_omega (void);
+static int compute_discrepancy(struct rscode_driver * driver, int lambda[], int S[], int L, int n);
+static void init_gamma(struct rscode_driver * driver, int gamma[]);
+static void compute_modified_omega (struct rscode_driver * driver);
 
 /********** polynomial arithmetic *******************/
 
-void add_polys (int dst[], int src[]) 
+void add_polys (struct rscode_driver * driver, int dst[], int src[]) 
 {
   int i;
   for (i = 0; i < MAXDEG; i++) dst[i] ^= src[i];
 }
 
-void copy_poly (int dst[], int src[]) 
+void copy_poly (struct rscode_driver * driver, int dst[], int src[]) 
 {
   int i;
   for (i = 0; i < MAXDEG; i++) dst[i] = src[i];
 }
 
-void scale_poly (int k, int poly[]) 
+void scale_poly (struct rscode_driver * driver, int k, int poly[]) 
 { 
   int i;
-  for (i = 0; i < MAXDEG; i++) poly[i] = gmult(k, poly[i]);
+  for (i = 0; i < MAXDEG; i++) poly[i] = gmult(driver, k, poly[i]);
 }
 
 
-void zero_poly (int poly[]) 
+void zero_poly (struct rscode_driver * driver, int poly[]) 
 {
   int i;
   for (i = 0; i < MAXDEG; i++) poly[i] = 0;
@@ -83,7 +83,7 @@ void zero_poly (int poly[])
 
 
 /* multiply by z, i.e., shift right by 1 */
-static void mul_z_poly (int src[])
+static void mul_z_poly (struct rscode_driver * driver, int src[])
 {
   int i;
   for (i = MAXDEG-1; i > 0; i--) src[i] = src[i-1];
@@ -92,7 +92,7 @@ static void mul_z_poly (int src[])
 
 /* polynomial multiplication */
 void
-mult_polys (int dst[], int p1[], int p2[])
+mult_polys (struct rscode_driver * driver, int dst[], int p1[], int p2[])
 {
   int i, j;
   int tmp1[MAXDEG*2];
@@ -103,7 +103,7 @@ mult_polys (int dst[], int p1[], int p2[])
     for(j=MAXDEG; j<(MAXDEG*2); j++) tmp1[j]=0;
     
     /* scale tmp1 by p1[i] */
-    for(j=0; j<MAXDEG; j++) tmp1[j]=gmult(p2[j], p1[i]);
+    for(j=0; j<MAXDEG; j++) tmp1[j]=gmult(driver, p2[j], p1[i]);
     /* and mult (shift) tmp1 right by i */
     for (j = (MAXDEG*2)-1; j >= i; j--) tmp1[j] = tmp1[j-i];
     for (j = 0; j < i; j++) tmp1[j] = 0;
@@ -123,37 +123,37 @@ static int NErasures;
 
 /* From  Cain, Clark, "Error-Correction Coding For Digital Communications", pp. 216. */
 void
-Modified_Berlekamp_Massey (void)
+Modified_Berlekamp_Massey (struct rscode_driver * driver)
 {	
   int n, L, L2, k, d, i;
   int psi[MAXDEG], psi2[MAXDEG], D[MAXDEG];
   int gamma[MAXDEG];
 	
   /* initialize Gamma, the erasure locator polynomial */
-  init_gamma(gamma);
+  init_gamma(driver, gamma);
 
   /* initialize to z */
-  copy_poly(D, gamma);
-  mul_z_poly(D);
+  copy_poly(driver, D, gamma);
+  mul_z_poly(driver, D);
 	
-  copy_poly(psi, gamma);	
+  copy_poly(driver, psi, gamma);	
   k = -1; L = NErasures;
 	
   for (n = NErasures; n < NPAR; n++) {
 	
-    d = compute_discrepancy(psi, synBytes, L, n);
+    d = compute_discrepancy(driver, psi, synBytes, L, n);
 		
     if (d != 0) {
 		
       /* psi2 = psi - d*D */
-      for (i = 0; i < MAXDEG; i++) psi2[i] = psi[i] ^ gmult(d, D[i]);
+      for (i = 0; i < MAXDEG; i++) psi2[i] = psi[i] ^ gmult(driver, d, D[i]);
 		
 		
       if (L < (n-k)) {
 	L2 = n-k;
 	k = n-L;
 	/* D = scale_poly(ginv(d), psi); */
-	for (i = 0; i < MAXDEG; i++) D[i] = gmult(psi[i], ginv(d));
+	for (i = 0; i < MAXDEG; i++) D[i] = gmult(driver, psi[i], ginv(driver, d));
 	L = L2;
       }
 			
@@ -161,11 +161,11 @@ Modified_Berlekamp_Massey (void)
       for (i = 0; i < MAXDEG; i++) psi[i] = psi2[i];
     }
 		
-    mul_z_poly(D);
+    mul_z_poly(driver, D);
   }
 	
   for(i = 0; i < MAXDEG; i++) Lambda[i] = psi[i];
-  compute_modified_omega();
+  compute_modified_omega(driver);
 
 	
 }
@@ -175,55 +175,55 @@ Modified_Berlekamp_Massey (void)
    Psi*S mod z^4
   */
 void
-compute_modified_omega ()
+compute_modified_omega (struct rscode_driver * driver)
 {
   int i;
   int product[MAXDEG*2];
 	
-  mult_polys(product, Lambda, synBytes);	
-  zero_poly(Omega);
+  mult_polys(driver, product, Lambda, synBytes);	
+  zero_poly(driver, Omega);
   for(i = 0; i < NPAR; i++) Omega[i] = product[i];
 
 }
 
 /* gamma = product (1-z*a^Ij) for erasure locs Ij */
 void
-init_gamma (int gamma[])
+init_gamma (struct rscode_driver * driver, int gamma[])
 {
   int e, tmp[MAXDEG];
 	
-  zero_poly(gamma);
-  zero_poly(tmp);
+  zero_poly(driver, gamma);
+  zero_poly(driver, tmp);
   gamma[0] = 1;
 	
   for (e = 0; e < NErasures; e++) {
-    copy_poly(tmp, gamma);
-    scale_poly(gexp[ErasureLocs[e]], tmp);
-    mul_z_poly(tmp);
-    add_polys(gamma, tmp);
+    copy_poly(driver, tmp, gamma);
+    scale_poly(driver, driver->gexp[ErasureLocs[e]], tmp);
+    mul_z_poly(driver, tmp);
+    add_polys(driver, gamma, tmp);
   }
 }
 	
 	
 	
 void 
-compute_next_omega (int d, int A[], int dst[], int src[])
+compute_next_omega (struct rscode_driver * driver, int d, int A[], int dst[], int src[])
 {
   int i;
   for ( i = 0; i < MAXDEG;  i++) {
-    dst[i] = src[i] ^ gmult(d, A[i]);
+    dst[i] = src[i] ^ gmult(driver, d, A[i]);
   }
 }
 	
 
 
 int
-compute_discrepancy (int lambda[], int S[], int L, int n)
+compute_discrepancy (struct rscode_driver * driver, int lambda[], int S[], int L, int n)
 {
   int i, sum=0;
 	
   for (i = 0; i <= L; i++) 
-    sum ^= gmult(lambda[i], S[n-i]);
+    sum ^= gmult(driver, lambda[i], S[n-i]);
   return (sum);
 }
 
@@ -235,7 +235,7 @@ compute_discrepancy (int lambda[], int S[], int L, int n)
 
 
 void 
-Find_Roots (void)
+Find_Roots (struct rscode_driver * driver)
 {
   int sum, r, k;	
   NErrors = 0;
@@ -244,7 +244,7 @@ Find_Roots (void)
     sum = 0;
     /* evaluate lambda at r */
     for (k = 0; k < NPAR+1; k++) {
-      sum ^= gmult(gexp[(k*r)%255], Lambda[k]);
+      sum ^= gmult(driver, driver->gexp[(k*r)%255], Lambda[k]);
     }
     if (sum == 0) 
       { 
@@ -270,7 +270,7 @@ Find_Roots (void)
  */
 
 int
-correct_errors_erasures (unsigned char codeword[], 
+correct_errors_erasures (struct rscode_driver * driver, unsigned char codeword[], 
 			 int csize,
 			 int nerasures,
 			 int erasures[])
@@ -283,8 +283,8 @@ correct_errors_erasures (unsigned char codeword[],
   NErasures = nerasures;
   for (i = 0; i < NErasures; i++) ErasureLocs[i] = erasures[i];
 
-  Modified_Berlekamp_Massey();
-  Find_Roots();
+  Modified_Berlekamp_Massey(driver);
+  Find_Roots(driver);
   
 
   if ((NErrors <= NPAR) && NErrors > 0) { 
@@ -306,15 +306,15 @@ correct_errors_erasures (unsigned char codeword[],
 
       num = 0;
       for (j = 0; j < MAXDEG; j++) 
-	num ^= gmult(Omega[j], gexp[((255-i)*j)%255]);
+	num ^= gmult(driver, Omega[j], driver->gexp[((255-i)*j)%255]);
       
       /* evaluate Lambda' (derivative) at alpha^(-i) ; all odd powers disappear */
       denom = 0;
       for (j = 1; j < MAXDEG; j += 2) {
-	denom ^= gmult(Lambda[j], gexp[((255-i)*(j-1)) % 255]);
+	denom ^= gmult(driver, Lambda[j], driver->gexp[((255-i)*(j-1)) % 255]);
       }
       
-      err = gmult(num, ginv(denom));
+      err = gmult(driver, num, ginv(driver, denom));
 #ifdef DEBUG
       fprintf(stderr, "Error magnitude %#x at loc %d\n", err, csize-i);
 #endif
