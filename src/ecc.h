@@ -81,6 +81,16 @@ struct rscode_driver {
   int pBytes[MAXDEG];
   /* Decoder syndrome bytes */
   int synBytes[MAXDEG];
+  /* The Error Locator Polynomial, also known as Lambda or Sigma. Lambda[0] == 1 */
+  int Lambda[MAXDEG];
+  /* The Error Evaluator Polynomial */
+  int Omega[MAXDEG];
+  /* error locations found using Chien's search*/
+  int ErrorLocs[256];
+  int NErrors;
+  /* erasure flags */
+  int ErasureLocs[256];
+  int NErasures;
 };
 
 void rscode_init(struct rscode_driver * driver);

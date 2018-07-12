@@ -43,12 +43,6 @@
 #include "rs.h"
 #include "galois.h"
 
-/* The Error Locator Polynomial, also known as Lambda or Sigma. Lambda[0] == 1 */
-static int Lambda[MAXDEG];
-
-/* The Error Evaluator Polynomial */
-static int Omega[MAXDEG];
-
 /* local ANSI declarations */
 static int compute_discrepancy(struct rscode_driver * driver, int lambda[], int S[], int L, int n);
 static void init_gamma(struct rscode_driver * driver, int gamma[]);
@@ -113,14 +107,6 @@ mult_polys (struct rscode_driver * driver, int dst[], int p1[], int p2[])
   }
 }
 
-/* error locations found using Chien's search*/
-static int ErrorLocs[256];
-static int NErrors;
-
-/* erasure flags */
-static int ErasureLocs[256];
-static int NErasures;
-
 /* From  Cain, Clark, "Error-Correction Coding For Digital Communications", pp. 216. */
 void
 Modified_Berlekamp_Massey (struct rscode_driver * driver)
@@ -137,9 +123,9 @@ Modified_Berlekamp_Massey (struct rscode_driver * driver)
   mul_z_poly(driver, D);
 	
   copy_poly(driver, psi, gamma);	
-  k = -1; L = NErasures;
+  k = -1; L = driver->NErasures;
 	
-  for (n = NErasures; n < NPAR; n++) {
+  for (n = driver->NErasures; n < NPAR; n++) {
 	
     d = compute_discrepancy(driver, psi, driver->synBytes, L, n);
 		
@@ -164,13 +150,13 @@ Modified_Berlekamp_Massey (struct rscode_driver * driver)
     mul_z_poly(driver, D);
   }
 	
-  for(i = 0; i < MAXDEG; i++) Lambda[i] = psi[i];
+  for(i = 0; i < MAXDEG; i++) driver->Lambda[i] = psi[i];
   compute_modified_omega(driver);
 
 	
 }
 
-/* given Psi (called Lambda in Modified_Berlekamp_Massey) and driver->synBytes,
+/* given Psi (called driver->Lambda in Modified_Berlekamp_Massey) and driver->synBytes,
    compute the combined erasure/error evaluator polynomial as 
    Psi*S mod z^4
   */
@@ -180,9 +166,9 @@ compute_modified_omega (struct rscode_driver * driver)
   int i;
   int product[MAXDEG*2];
 	
-  mult_polys(driver, product, Lambda, driver->synBytes);	
-  zero_poly(driver, Omega);
-  for(i = 0; i < NPAR; i++) Omega[i] = product[i];
+  mult_polys(driver, product, driver->Lambda, driver->synBytes);	
+  zero_poly(driver, driver->Omega);
+  for(i = 0; i < NPAR; i++) driver->Omega[i] = product[i];
 
 }
 
@@ -196,9 +182,9 @@ init_gamma (struct rscode_driver * driver, int gamma[])
   zero_poly(driver, tmp);
   gamma[0] = 1;
 	
-  for (e = 0; e < NErasures; e++) {
+  for (e = 0; e < driver->NErasures; e++) {
     copy_poly(driver, tmp, gamma);
-    scale_poly(driver, driver->gexp[ErasureLocs[e]], tmp);
+    scale_poly(driver, driver->gexp[driver->ErasureLocs[e]], tmp);
     mul_z_poly(driver, tmp);
     add_polys(driver, gamma, tmp);
   }
@@ -228,7 +214,7 @@ compute_discrepancy (struct rscode_driver * driver, int lambda[], int S[], int L
 }
 
 /* Finds all the roots of an error-locator polynomial with coefficients
- * Lambda[j] by evaluating Lambda at successive values of alpha. 
+ * driver->Lambda[j] by evaluating driver->Lambda at successive values of alpha. 
  * 
  * This can be tested with the decoder's equations case.
  */
@@ -238,17 +224,17 @@ void
 Find_Roots (struct rscode_driver * driver)
 {
   int sum, r, k;	
-  NErrors = 0;
+  driver->NErrors = 0;
   
   for (r = 1; r < 256; r++) {
     sum = 0;
     /* evaluate lambda at r */
     for (k = 0; k < NPAR+1; k++) {
-      sum ^= gmult(driver, driver->gexp[(k*r)%255], Lambda[k]);
+      sum ^= gmult(driver, driver->gexp[(k*r)%255], driver->Lambda[k]);
     }
     if (sum == 0) 
       { 
-	ErrorLocs[NErrors] = (255-r); NErrors++; 
+	driver->ErrorLocs[driver->NErrors] = (255-r); driver->NErrors++; 
 #ifdef DEBUG
 	fprintf(stderr, "Root found at r = %d, (255-r) = %d\n", r, (255-r));
 #endif
@@ -262,7 +248,7 @@ Find_Roots (struct rscode_driver * driver)
  * an array of any known erasure locations, along the number
  * of these erasures.
  * 
- * Evaluate Omega(actually Psi)/Lambda' at the roots
+ * Evaluate driver->Omega(actually Psi)/driver->Lambda' at the roots
  * alpha^(-i) for error locs i. 
  *
  * Returns 1 if everything ok, or 0 if an out-of-bounds error is found
@@ -278,20 +264,20 @@ correct_errors_erasures (struct rscode_driver * driver, unsigned char codeword[]
   int r, i, j, err;
 
   /* If you want to take advantage of erasure correction, be sure to
-     set NErasures and ErasureLocs[] with the locations of erasures. 
+     set driver->NErasures and driver->ErasureLocs[] with the locations of erasures. 
      */
-  NErasures = nerasures;
-  for (i = 0; i < NErasures; i++) ErasureLocs[i] = erasures[i];
+  driver->NErasures = nerasures;
+  for (i = 0; i < driver->NErasures; i++) driver->ErasureLocs[i] = erasures[i];
 
   Modified_Berlekamp_Massey(driver);
   Find_Roots(driver);
   
 
-  if ((NErrors <= NPAR) && NErrors > 0) { 
+  if ((driver->NErrors <= NPAR) && driver->NErrors > 0) { 
 
     /* first check for illegal error locs */
-    for (r = 0; r < NErrors; r++) {
-      if (ErrorLocs[r] >= csize) {
+    for (r = 0; r < driver->NErrors; r++) {
+      if (driver->ErrorLocs[r] >= csize) {
 #ifdef DEBUG
 	fprintf(stderr, "Error loc i=%d outside of codeword length %d\n", i, csize);
 #endif
@@ -299,19 +285,19 @@ correct_errors_erasures (struct rscode_driver * driver, unsigned char codeword[]
       }
     }
 
-    for (r = 0; r < NErrors; r++) {
+    for (r = 0; r < driver->NErrors; r++) {
       int num, denom;
-      i = ErrorLocs[r];
-      /* evaluate Omega at alpha^(-i) */
+      i = driver->ErrorLocs[r];
+      /* evaluate driver->Omega at alpha^(-i) */
 
       num = 0;
       for (j = 0; j < MAXDEG; j++) 
-	num ^= gmult(driver, Omega[j], driver->gexp[((255-i)*j)%255]);
+	num ^= gmult(driver, driver->Omega[j], driver->gexp[((255-i)*j)%255]);
       
-      /* evaluate Lambda' (derivative) at alpha^(-i) ; all odd powers disappear */
+      /* evaluate driver->Lambda' (derivative) at alpha^(-i) ; all odd powers disappear */
       denom = 0;
       for (j = 1; j < MAXDEG; j += 2) {
-	denom ^= gmult(driver, Lambda[j], driver->gexp[((255-i)*(j-1)) % 255]);
+	denom ^= gmult(driver, driver->Lambda[j], driver->gexp[((255-i)*(j-1)) % 255]);
       }
       
       err = gmult(driver, num, ginv(driver, denom));
@@ -325,7 +311,7 @@ correct_errors_erasures (struct rscode_driver * driver, unsigned char codeword[]
   }
   else {
   #ifdef DEBUG
-    if (NErrors) fprintf(stderr, "Uncorrectable codeword\n");
+    if (driver->NErrors) fprintf(stderr, "Uncorrectable codeword\n");
   #endif
     return(0);
   }
