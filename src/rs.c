@@ -28,6 +28,8 @@
 #include <stdio.h>
 #include <ctype.h>
 #include "ecc.h"
+#include "galois.h"
+#include "berlekamp.h"
 
 /* Encoder parity bytes */
 int pBytes[MAXDEG];
