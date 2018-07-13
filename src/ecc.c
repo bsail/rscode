@@ -21,12 +21,17 @@ int rscode_decode(struct rscode_driver * driver, unsigned char *data, int nbytes
   if(ret!=0)
   {
     correct_errors_erasures (driver, data, 
-           nbytes,
-           0, 
-           0);
+           nbytes
+#ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
+           ,0, 
+           0
+#endif
+           );
   }
   return ret;
 }
+
+#ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
 
 int rscode_decode_with_erasures(struct rscode_driver * driver, unsigned char *data, int nbytes, int nerasures, int * erasures)
 {
@@ -40,3 +45,5 @@ int rscode_decode_with_erasures(struct rscode_driver * driver, unsigned char *da
            erasures);
   }
 }
+
+#endif

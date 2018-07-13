@@ -23,7 +23,11 @@ void mult_polys(struct rscode_driver * driver, int dst[], int p1[], int p2[]);
 void zero_poly(struct rscode_driver * driver, int poly[]);
 
 /* Error location routines */
-int correct_errors_erasures (struct rscode_driver * driver, unsigned char codeword[], int csize,int nerasures, int erasures[]);
+int correct_errors_erasures (struct rscode_driver * driver, unsigned char codeword[], int csize
+#ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
+  ,int nerasures, int erasures[]
+#endif
+  );
 
 #ifdef __cplusplus
 }

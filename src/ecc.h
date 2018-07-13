@@ -58,6 +58,13 @@ extern "C" {
 /* print debugging info */
 // #define DEBUG 1
 
+#ifndef TEST
+
+/* Disable erasures functions */
+#define RSCODE_DISABLE_ERASURES_FUNCTIONS 1
+
+#endif
+
 #define TRUE  (1)
 #define FALSE (0)
 
@@ -85,15 +92,19 @@ struct rscode_driver {
   /* error locations found using Chien's search*/
   int ErrorLocs[256];
   int NErrors;
+#ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
   /* erasure flags */
   int ErasureLocs[256];
   int NErasures;
+#endif
 };
 
 void rscode_init(struct rscode_driver * driver);
 void rscode_encode(struct rscode_driver * driver, unsigned char *msg, int nbytes, unsigned char *dst);
 int rscode_decode(struct rscode_driver * driver, unsigned char *data, int nbytes);
+#ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
 int rscode_decode_with_erasures(struct rscode_driver * driver, unsigned char *data, int nbytes, int nerasures, int * erasures);
+#endif
 
 #ifdef __cplusplus
 }

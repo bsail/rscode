@@ -90,6 +90,8 @@ static int searh_in_erasures(int value, int nerasures, int * erasures)
   return ret;
 }
 
+#ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
+
 void test_ecc_should_work_with_erasures(void)
 {
   uint8_t length = LENGTH;
@@ -235,3 +237,4 @@ void test_ecc_should_not_work_with_erasures_too_many_errors(void)
   TEST_ASSERT_NOT_EQUAL(1,rscode_decode_with_erasures(&driver, newword, ML, nerasures, erasures));
 }
 
+#endif

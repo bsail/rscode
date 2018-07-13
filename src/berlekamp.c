@@ -123,9 +123,15 @@ Modified_Berlekamp_Massey (struct rscode_driver * driver)
   mul_z_poly(driver, D);
 	
   copy_poly(driver, psi, gamma);	
-  k = -1; L = driver->NErasures;
-	
-  for (n = driver->NErasures; n < NPAR; n++) {
+  k = -1;
+
+#ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
+  L = driver->NErasures;
+#else
+  L = 0;
+#endif
+
+  for (n = L/*driver->NErasures*/; n < NPAR; n++) {
 	
     d = compute_discrepancy(driver, psi, driver->synBytes, L, n);
 		
@@ -181,13 +187,15 @@ init_gamma (struct rscode_driver * driver, int gamma[])
   zero_poly(driver, gamma);
   zero_poly(driver, tmp);
   gamma[0] = 1;
-	
+
+#ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS	
   for (e = 0; e < driver->NErasures; e++) {
     copy_poly(driver, tmp, gamma);
     scale_poly(driver, gexp(driver,driver->ErasureLocs[e]), tmp);
     mul_z_poly(driver, tmp);
     add_polys(driver, gamma, tmp);
   }
+#endif
 }
 
 
@@ -257,17 +265,22 @@ Find_Roots (struct rscode_driver * driver)
 
 int
 correct_errors_erasures (struct rscode_driver * driver, unsigned char codeword[], 
-			 int csize,
-			 int nerasures,
-			 int erasures[])
+			 int csize
+#ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
+       ,int nerasures,
+			 int erasures[]
+#endif
+       )
 {
   int r, i, j, err;
 
   /* If you want to take advantage of erasure correction, be sure to
      set driver->NErasures and driver->ErasureLocs[] with the locations of erasures. 
      */
+#ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
   driver->NErasures = nerasures;
   for (i = 0; i < driver->NErasures; i++) driver->ErasureLocs[i] = erasures[i];
+#endif
 
   Modified_Berlekamp_Massey(driver);
   Find_Roots(driver);
