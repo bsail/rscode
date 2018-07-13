@@ -63,7 +63,7 @@
 #define PRIM_POLY 0435
 #define NWM1 ((1 << 8)-1)
 
-int gexp(struct rscode_driver * driver, int z)
+int gexp(__attribute__((unused)) struct rscode_driver * driver, int z)
 {
   int i;
   int pinit,p1,p2,p3,p4,p5,p6,p7,p8;
@@ -107,7 +107,7 @@ int gexp(struct rscode_driver * driver, int z)
 //   return ret;
 // }
 
-int gmult(struct rscode_driver * driver, int x, int y)
+int gmult(__attribute__((unused)) struct rscode_driver * driver, int x, int y)
 {
   if (x==0 || y == 0) return (0);
   int prod;
@@ -144,7 +144,7 @@ int gmult(struct rscode_driver * driver, int x, int y)
 void galois_invert_binary_matrix(int *mat, int *inv)
 {
   int rows = 8;
-  int cols, i, j, k;
+  int cols, i, j;
   int tmp;
  
   cols = rows;
@@ -188,9 +188,9 @@ void galois_invert_binary_matrix(int *mat, int *inv)
 int galois_shift_inverse(int y)
 {
   int w = 8;
-  int mat[32], mat2[8];
-  int inv[32], inv2[8];
-  int ind, i, j, k, prod;
+  int mat2[8];
+  int inv2[8];
+  int i;
  
   for (i = 0; i < w; i++) {
     mat2[i] = y;
@@ -208,7 +208,7 @@ int galois_shift_inverse(int y)
   return inv2[0]; 
 }
 
-int ginv (struct rscode_driver * driver, int elt) 
+int ginv (__attribute__((unused)) struct rscode_driver * driver, int elt) 
 {
   return galois_shift_inverse(elt);
   // return (gexp(driver,255-glog(driver,elt)));

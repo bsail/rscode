@@ -50,13 +50,13 @@ static void compute_modified_omega (struct rscode_driver * driver);
 
 /********** polynomial arithmetic *******************/
 
-void add_polys (struct rscode_driver * driver, int dst[], int src[]) 
+void add_polys (__attribute__((unused)) struct rscode_driver * driver, int dst[], int src[]) 
 {
   int i;
   for (i = 0; i < MAXDEG; i++) dst[i] ^= src[i];
 }
 
-void copy_poly (struct rscode_driver * driver, int dst[], int src[]) 
+void copy_poly (__attribute__((unused)) struct rscode_driver * driver, int dst[], int src[]) 
 {
   int i;
   for (i = 0; i < MAXDEG; i++) dst[i] = src[i];
@@ -69,7 +69,7 @@ void scale_poly (struct rscode_driver * driver, int k, int poly[])
 }
 
 
-void zero_poly (struct rscode_driver * driver, int poly[]) 
+void zero_poly (__attribute__((unused)) struct rscode_driver * driver, int poly[]) 
 {
   int i;
   for (i = 0; i < MAXDEG; i++) poly[i] = 0;
@@ -77,7 +77,7 @@ void zero_poly (struct rscode_driver * driver, int poly[])
 
 
 /* multiply by z, i.e., shift right by 1 */
-static void mul_z_poly (struct rscode_driver * driver, int src[])
+static void mul_z_poly (__attribute__((unused)) struct rscode_driver * driver, int src[])
 {
   int i;
   for (i = MAXDEG-1; i > 0; i--) src[i] = src[i-1];
@@ -182,7 +182,10 @@ compute_modified_omega (struct rscode_driver * driver)
 void
 init_gamma (struct rscode_driver * driver, int gamma[])
 {
-  int e, tmp[MAXDEG];
+#ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS 
+  int e;
+#endif
+  int tmp[MAXDEG];
 	
   zero_poly(driver, gamma);
   zero_poly(driver, tmp);

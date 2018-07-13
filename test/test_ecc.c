@@ -11,18 +11,19 @@
 #include <string.h>
 #include <alloca.h>
 
+#define LENGTH 48
+unsigned char msg_example[256];
+
 void setUp(void)
 {
   time_t t;
   srand((unsigned) time(&t));
+  strcpy((char*)msg_example,"=0123456789abcdefghijklmnopqrstuwvzyx0123456789=");
 }
 
 void tearDown(void)
 {
 }
-
-#define LENGTH 48
-const unsigned char *msg_example = "=0123456789abcdefghijklmnopqrstuwvzyx0123456789=";
 
 void test_ecc_should_work_simple(void)
 {

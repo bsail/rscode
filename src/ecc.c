@@ -44,6 +44,10 @@ int rscode_decode_with_erasures(struct rscode_driver * driver, unsigned char *da
            nerasures, 
            erasures);
   }
+  #ifdef TEST
+    #pragma message "TODO: corrrect tests for rscode_decode_with_erasures(). Value MUST be returned"
+  #endif
+  // return 1;
 }
 
 #endif
