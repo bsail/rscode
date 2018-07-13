@@ -129,21 +129,6 @@ check_syndrome (struct rscode_driver * driver)
  return nz;
 }
 
-#ifdef DEBUG
-
-void
-debug_check_syndrome (struct rscode_driver * driver)
-{	
-  int i;
-	
-  for (i = 0; i < 3; i++) {
-    printf(" inv log S[%d]/S[%d] = %d\n", i, i+1, 
-	   glog[gmult(driver, driver->synBytes[i], ginv(driver, driver->synBytes[i+1]))]);
-  }
-}
-
-#endif
-
 /* Create a generator polynomial for an n byte RS code. 
  * The coefficients are returned in the driver->genPoly arg.
  * Make sure that the driver->genPoly array which is passed in is 

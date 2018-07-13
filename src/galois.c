@@ -65,7 +65,6 @@ init_exp_table (struct rscode_driver * driver)
 	
   driver->gexp[0] = 1;
   driver->gexp[255] = driver->gexp[0];
-  driver->glog[0] = 0;			/* shouldn't log[0] be an error? */
 	
   for (i = 1; i < 256; i++) {
     pinit = p8;
@@ -80,15 +79,21 @@ init_exp_table (struct rscode_driver * driver)
     driver->gexp[i] = p1 + p2*2 + p3*4 + p4*8 + p5*16 + p6*32 + p7*64 + p8*128;
     driver->gexp[i+255] = driver->gexp[i];
   }
-	
-  for (i = 1; i < 256; i++) {
-    for (z = 0; z < 256; z++) {
-      if (driver->gexp[z] == i) {
-	driver->glog[i] = z;
-	break;
-      }
+}
+
+static int glog(struct rscode_driver * driver, int value)
+{
+  int z;
+  int ret = 0;
+
+  for (z = 0; z < 256; z++) {
+    if (driver->gexp[z] == value) {
+      ret = z;
+      break;
     }
   }
+
+  return ret;
 }
 
 /* multiplication using logarithms */
@@ -96,14 +101,15 @@ int gmult(struct rscode_driver * driver, int a, int b)
 {
   int i,j;
   if (a==0 || b == 0) return (0);
-  i = driver->glog[a];
-  j = driver->glog[b];
+  i = glog(driver,a);
+  j = glog(driver,b);
   return (driver->gexp[i+j]);
 }
 		
 
 int ginv (struct rscode_driver * driver, int elt) 
 { 
-  return (driver->gexp[255-driver->glog[elt]]);
+  return (driver->gexp[255-glog(driver,elt)]);
+  // return (driver->gexp[255-driver->glog[elt]]);
 }
 

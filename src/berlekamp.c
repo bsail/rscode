@@ -309,11 +309,11 @@ correct_errors_erasures (struct rscode_driver * driver, unsigned char codeword[]
     }
     return(1);
   }
-  // else {
+  else {
   #ifdef DEBUG
     if (driver->NErrors) fprintf(stderr, "Uncorrectable codeword\n");
   #endif
     return(0);
-  // }
+  }
 }
 

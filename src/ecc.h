@@ -74,7 +74,6 @@ typedef uint16_t BIT16;
 struct rscode_driver {
 /* galois arithmetic tables */
   int gexp[512];
-  int glog[256];
   /* generator polynomial */
   int genPoly[MAXDEG*2];
   /* Encoder parity bytes */
