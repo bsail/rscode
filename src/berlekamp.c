@@ -35,7 +35,7 @@
  *
  */
 
-#define RSCODE_FLIR_INTERNAL
+#define RSCODE_INTERNAL
 #ifdef DEBUG
 #include <stdio.h>
 #endif
@@ -189,9 +189,9 @@ init_gamma (struct rscode_driver * driver, int gamma[])
     add_polys(driver, gamma, tmp);
   }
 }
-	
-	
-	
+
+
+#if 0
 void 
 compute_next_omega (struct rscode_driver * driver, int d, int A[], int dst[], int src[])
 {
@@ -200,7 +200,7 @@ compute_next_omega (struct rscode_driver * driver, int d, int A[], int dst[], in
     dst[i] = src[i] ^ gmult(driver, d, A[i]);
   }
 }
-	
+#endif
 
 
 int

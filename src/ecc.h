@@ -96,6 +96,7 @@ struct rscode_driver {
 void rscode_init(struct rscode_driver * driver);
 void rscode_encode(struct rscode_driver * driver, unsigned char *msg, int nbytes, unsigned char *dst);
 int rscode_decode(struct rscode_driver * driver, unsigned char *data, int nbytes);
+int rscode_decode_with_erasures(struct rscode_driver * driver, unsigned char *data, int nbytes, int nerasures, int * erasures);
 
 #ifdef __cplusplus
 }

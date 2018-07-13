@@ -1,12 +1,11 @@
-#define RSCODE_FLIR_INTERNAL
+#define RSCODE_INTERNAL
 #include "ecc.h"
 #include "rs.h"
 #include "berlekamp.h"
-#include <string.h>
 
 void rscode_init(struct rscode_driver * driver)
 {
-  memset(driver,0,sizeof(struct rscode_driver));
+  zero_fill_from ((unsigned char *)driver,0,sizeof(struct rscode_driver));
   initialize_ecc (driver);
 }
 
@@ -27,4 +26,17 @@ int rscode_decode(struct rscode_driver * driver, unsigned char *data, int nbytes
            0);
   }
   return ret;
+}
+
+int rscode_decode_with_erasures(struct rscode_driver * driver, unsigned char *data, int nbytes, int nerasures, int * erasures)
+{
+  decode_data(driver, data, nbytes);
+  int ret = check_syndrome (driver);
+  if(ret!=0)
+  {
+    correct_errors_erasures (driver, data, 
+           nbytes,
+           nerasures, 
+           erasures);
+  }
 }

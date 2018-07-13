@@ -25,7 +25,7 @@
  * Source code is available at http://rscode.sourceforge.net
  */
 
-#define RSCODE_FLIR_INTERNAL
+#define RSCODE_INTERNAL
 #ifdef DEBUG
 #include <stdio.h>
 #endif
@@ -49,7 +49,7 @@ initialize_ecc (struct rscode_driver * driver)
 }
 
 void
-zero_fill_from (struct rscode_driver * driver, unsigned char * buf, int from, int to)
+zero_fill_from (unsigned char * buf, int from, int to)
 {
   int i;
   for (i = from; i < to; i++) buf[i] = 0;

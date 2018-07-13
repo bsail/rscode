@@ -8,7 +8,7 @@ extern "C" {
 #include "ecc.h"
 
 #ifndef TEST
-#ifndef RSCODE_FLIR_INTERNAL
+#ifndef RSCODE_INTERNAL
 #error "There is no user accessable data and functions here"
 #endif
 #endif
