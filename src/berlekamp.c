@@ -273,7 +273,7 @@ correct_errors_erasures (struct rscode_driver * driver, unsigned char codeword[]
   Find_Roots(driver);
   
 
-  if ((driver->NErrors <= NPAR) && driver->NErrors > 0) { 
+  if ((driver->NErrors <= NPAR) && (driver->NErrors > 0)) { 
 
     /* first check for illegal error locs */
     for (r = 0; r < driver->NErrors; r++) {
@@ -309,11 +309,11 @@ correct_errors_erasures (struct rscode_driver * driver, unsigned char codeword[]
     }
     return(1);
   }
-  else {
+  // else {
   #ifdef DEBUG
     if (driver->NErrors) fprintf(stderr, "Uncorrectable codeword\n");
   #endif
     return(0);
-  }
+  // }
 }
 
