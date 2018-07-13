@@ -43,29 +43,15 @@
 /* x^8 + x^4 + x^3 + x^2 + 1 */
 #define PPOLY 0x1D 
 
-static void init_exp_table (struct rscode_driver * driver);
-
-
-void
-init_galois_tables (struct rscode_driver * driver)
-{	
-  /* initialize the table of powers of alpha */
-  init_exp_table(driver);
-}
-
-
-static void
-init_exp_table (struct rscode_driver * driver)
+int gexp(struct rscode_driver * driver, int z)
 {
-  int i, z;
+  int i;
   int pinit,p1,p2,p3,p4,p5,p6,p7,p8;
+  int ret = 1;
 
   pinit = p2 = p3 = p4 = p5 = p6 = p7 = p8 = 0;
   p1 = 1;
-	
-  driver->gexp[0] = 1;
-  driver->gexp[255] = driver->gexp[0];
-	
+  
   for (i = 1; i < 256; i++) {
     pinit = p8;
     p8 = p7;
@@ -76,9 +62,11 @@ init_exp_table (struct rscode_driver * driver)
     p3 = p2 ^ pinit;
     p2 = p1;
     p1 = pinit;
-    driver->gexp[i] = p1 + p2*2 + p3*4 + p4*8 + p5*16 + p6*32 + p7*64 + p8*128;
-    driver->gexp[i+255] = driver->gexp[i];
+    if((i==z)||((i+255)==z)){
+      ret = p1 + p2*2 + p3*4 + p4*8 + p5*16 + p6*32 + p7*64 + p8*128;
+    }
   }
+  return ret;
 }
 
 static int glog(struct rscode_driver * driver, int value)
@@ -87,7 +75,7 @@ static int glog(struct rscode_driver * driver, int value)
   int ret = 0;
 
   for (z = 0; z < 256; z++) {
-    if (driver->gexp[z] == value) {
+    if (gexp(driver,z) == value) {
       ret = z;
       break;
     }
@@ -103,13 +91,12 @@ int gmult(struct rscode_driver * driver, int a, int b)
   if (a==0 || b == 0) return (0);
   i = glog(driver,a);
   j = glog(driver,b);
-  return (driver->gexp[i+j]);
+  return (gexp(driver,i+j));
 }
 		
 
 int ginv (struct rscode_driver * driver, int elt) 
 { 
-  return (driver->gexp[255-glog(driver,elt)]);
-  // return (driver->gexp[255-driver->glog[elt]]);
+  return (gexp(driver,255-glog(driver,elt)));
 }
 

@@ -184,7 +184,7 @@ init_gamma (struct rscode_driver * driver, int gamma[])
 	
   for (e = 0; e < driver->NErasures; e++) {
     copy_poly(driver, tmp, gamma);
-    scale_poly(driver, driver->gexp[driver->ErasureLocs[e]], tmp);
+    scale_poly(driver, gexp(driver,driver->ErasureLocs[e]), tmp);
     mul_z_poly(driver, tmp);
     add_polys(driver, gamma, tmp);
   }
@@ -230,7 +230,7 @@ Find_Roots (struct rscode_driver * driver)
     sum = 0;
     /* evaluate lambda at r */
     for (k = 0; k < NPAR+1; k++) {
-      sum ^= gmult(driver, driver->gexp[(k*r)%255], driver->Lambda[k]);
+      sum ^= gmult(driver, gexp(driver,(k*r)%255), driver->Lambda[k]);
     }
     if (sum == 0) 
       { 
@@ -292,12 +292,12 @@ correct_errors_erasures (struct rscode_driver * driver, unsigned char codeword[]
 
       num = 0;
       for (j = 0; j < MAXDEG; j++) 
-	num ^= gmult(driver, driver->Omega[j], driver->gexp[((255-i)*j)%255]);
+	num ^= gmult(driver, driver->Omega[j], gexp(driver,((255-i)*j)%255));
       
       /* evaluate driver->Lambda' (derivative) at alpha^(-i) ; all odd powers disappear */
       denom = 0;
       for (j = 1; j < MAXDEG; j += 2) {
-	denom ^= gmult(driver, driver->Lambda[j], driver->gexp[((255-i)*(j-1)) % 255]);
+	denom ^= gmult(driver, driver->Lambda[j], gexp(driver,((255-i)*(j-1)) % 255));
       }
       
       err = gmult(driver, num, ginv(driver, denom));

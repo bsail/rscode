@@ -41,11 +41,8 @@ compute_genpoly (struct rscode_driver * driver, int nbytes, int * genpoly);
 void
 initialize_ecc (struct rscode_driver * driver)
 {
-  /* Initialize the galois field arithmetic tables */
-    init_galois_tables(driver);
-
-    /* Compute the encoder generator polynomial */
-    compute_genpoly(driver, NPAR, driver->genPoly);
+  /* Compute the encoder generator polynomial */
+  compute_genpoly(driver, NPAR, driver->genPoly);
 }
 
 void
@@ -108,7 +105,7 @@ decode_data(struct rscode_driver * driver, unsigned char * data, int nbytes)
   for (j = 0; j < NPAR;  j++) {
     sum	= 0;
     for (i = 0; i < nbytes; i++) {
-      sum = data[i] ^ gmult(driver, driver->gexp[j+1], sum);
+      sum = data[i] ^ gmult(driver, gexp(driver,j+1), sum);
     }
     driver->synBytes[j]  = sum;
   }
@@ -147,7 +144,7 @@ compute_genpoly (struct rscode_driver * driver, int nbytes, int * genpoly)
 
   for (i = 1; i <= nbytes; i++) {
     zero_poly(driver, tp);
-    tp[0] = driver->gexp[i];		/* set up x+a^n */
+    tp[0] = gexp(driver,i);		/* set up x+a^n */
     tp[1] = 1;
 	  
     mult_polys(driver, genpoly, tp, tp1);

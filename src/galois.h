@@ -13,9 +13,9 @@ extern "C" {
 #endif
 #endif
 
-void init_galois_tables (struct rscode_driver * driver);
 int gmult(struct rscode_driver * driver, int a, int b);
 int ginv(struct rscode_driver * driver, int elt);
+int gexp(struct rscode_driver * driver, int z);
 
 #ifdef __cplusplus
 }
