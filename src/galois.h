@@ -13,7 +13,7 @@ extern "C" {
 #endif
 #endif
 
-int gmult(struct rscode_driver * driver, int a, int b);
+int gmult(struct rscode_driver * driver, int x, int y);
 int ginv(struct rscode_driver * driver, int elt);
 int gexp(struct rscode_driver * driver, int z);
 

@@ -27,6 +27,23 @@
  *
  * From Mee, Daniel, "Magnetic Recording, Volume III", Ch. 5 by Patel.
  * 
+ * 
+ * Part of software was licensed by GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * Galois.c
+ * James S. Plank
+ * April, 2007
+ * Galois.tar - Fast Galois Field Arithmetic Library in C/C+
+ * Copright (C) 2007 James S. Plank
+ * 
+ * James S. Plank
+ * Department of Computer Science
+ * University of Tennessee
+ * Knoxville, TN 37996
+ * plank@cs.utk.edu
+ * 
+ * http://web.eecs.utk.edu/~plank/plank/papers/CS-07-593/
  *
  ******************************/
  
@@ -43,6 +60,9 @@
 /* x^8 + x^4 + x^3 + x^2 + 1 */
 #define PPOLY 0x1D 
 
+#define PRIM_POLY 0435
+#define NWM1 ((1 << 8)-1)
+
 int gexp(struct rscode_driver * driver, int z)
 {
   int i;
@@ -52,51 +72,145 @@ int gexp(struct rscode_driver * driver, int z)
   pinit = p2 = p3 = p4 = p5 = p6 = p7 = p8 = 0;
   p1 = 1;
   
-  for (i = 1; i < 256; i++) {
-    pinit = p8;
-    p8 = p7;
-    p7 = p6;
-    p6 = p5;
-    p5 = p4 ^ pinit;
-    p4 = p3 ^ pinit;
-    p3 = p2 ^ pinit;
-    p2 = p1;
-    p1 = pinit;
-    if((i==z)||((i+255)==z)){
-      ret = p1 + p2*2 + p3*4 + p4*8 + p5*16 + p6*32 + p7*64 + p8*128;
+  // if(z>255)
+  //   z-=255;
+
+  if(z!=0) {
+    for (i = 1; i <= z; i++) {
+      pinit = p8;
+      p8 = p7;
+      p7 = p6;
+      p6 = p5;
+      p5 = p4 ^ pinit;
+      p4 = p3 ^ pinit;
+      p3 = p2 ^ pinit;
+      p2 = p1;
+      p1 = pinit;
     }
+    ret = p1 + (p2<<1) + (p3<<2) + (p4<<3) + (p5<<4) + (p6<<5) + (p7<<6) + (p8<<7);
   }
   return ret;
 }
 
-static int glog(struct rscode_driver * driver, int value)
-{
-  int z;
-  int ret = 0;
+// static int glog(struct rscode_driver * driver, int value)
+// {
+//   int z;
+//   int ret = 0;
 
-  for (z = 0; z < 256; z++) {
-    if (gexp(driver,z) == value) {
-      ret = z;
-      break;
+//   for (z = 0; z < 256; z++) {
+//     if (gexp(driver,z) == value) {
+//       ret = z;
+//       break;
+//     }
+//   }
+
+//   return ret;
+// }
+
+int gmult(struct rscode_driver * driver, int x, int y)
+{
+  if (x==0 || y == 0) return (0);
+  int prod;
+  int i, j, ind;
+  int k;
+  int scratch[8];
+  int w = 8;
+
+  prod = 0;
+  for (i = 0; i < w; i++) {
+    scratch[i] = y;
+    if (y & (1 << (w-1))) {
+      y = y << 1;
+      y = (y ^ PRIM_POLY) & NWM1;
+    } else {
+      y = y << 1;
+    }
+  }
+  for (i = 0; i < w; i++) {
+    ind = (1 << i);
+    if (ind & x) {
+      j = 1;
+      for (k = 0; k < w; k++) {
+        prod = prod ^ (j & scratch[i]);
+        j = (j << 1);
+      }
+    }
+  }
+  return prod;
+}	
+
+/* This will destroy mat, by the way */
+
+void galois_invert_binary_matrix(int *mat, int *inv)
+{
+  int rows = 8;
+  int cols, i, j, k;
+  int tmp;
+ 
+  cols = rows;
+
+  for (i = 0; i < rows; i++) inv[i] = (1 << i);
+
+  /* First -- convert into upper triangular */
+
+  for (i = 0; i < cols; i++) {
+
+    /* Swap rows if we ave a zero i,i element.  If we can't swap, then the 
+       matrix was not invertible */
+
+    if ((mat[i] & (1 << i)) == 0) { 
+      for (j = i+1; j < rows && (mat[j] & (1 << i)) == 0; j++) ;
+      tmp = mat[i]; mat[i] = mat[j]; mat[j] = tmp;
+      tmp = inv[i]; inv[i] = inv[j]; inv[j] = tmp;
+    }
+ 
+    /* Now for each j>i, add A_ji*Ai to Aj */
+    for (j = i+1; j != rows; j++) {
+      if ((mat[j] & (1 << i)) != 0) {
+        mat[j] ^= mat[i]; 
+        inv[j] ^= inv[i];
+      }
     }
   }
 
-  return ret;
+  /* Now the matrix is upper triangular.  Start at the top and multiply down */
+
+  for (i = rows-1; i >= 0; i--) {
+    for (j = 0; j < i; j++) {
+      if (mat[j] & (1 << i)) {
+/*        mat[j] ^= mat[i]; */
+        inv[j] ^= inv[i];
+      }
+    }
+  } 
 }
 
-/* multiplication using logarithms */
-int gmult(struct rscode_driver * driver, int a, int b)
+int galois_shift_inverse(int y)
 {
-  int i,j;
-  if (a==0 || b == 0) return (0);
-  i = glog(driver,a);
-  j = glog(driver,b);
-  return (gexp(driver,i+j));
+  int w = 8;
+  int mat[32], mat2[8];
+  int inv[32], inv2[8];
+  int ind, i, j, k, prod;
+ 
+  for (i = 0; i < w; i++) {
+    mat2[i] = y;
+
+    if (y & ((1 << 7))/*nw[w-1]*/) {
+      y = y << 1;
+      y = (y ^ PRIM_POLY) & NWM1/*nwm1[w]*/;
+    } else {
+      y = y << 1;
+    }
+  }
+
+  galois_invert_binary_matrix(mat2, inv2);
+
+  return inv2[0]; 
 }
-		
 
 int ginv (struct rscode_driver * driver, int elt) 
-{ 
-  return (gexp(driver,255-glog(driver,elt)));
+{
+  return galois_shift_inverse(elt);
+  // return (gexp(driver,255-glog(driver,elt)));
 }
 

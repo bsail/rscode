@@ -1,4 +1,4 @@
 *.bak
 build/**
 coverage.info
-
+doc/Galois.ods
