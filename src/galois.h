@@ -21,4 +21,4 @@ int gexp(struct rscode_driver * driver, int z);
 }
 #endif
 
-#endif // _GALOIS_H
+#endif /* _GALOIS_H */

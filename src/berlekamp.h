@@ -33,4 +33,4 @@ int correct_errors_erasures (struct rscode_driver * driver, unsigned char codewo
 }
 #endif
 
-#endif // _BERLEKAMP_H
+#endif /* _BERLEKAMP_H */

@@ -72,9 +72,6 @@ int gexp(__attribute__((unused)) struct rscode_driver * driver, int z)
   pinit = p2 = p3 = p4 = p5 = p6 = p7 = p8 = 0;
   p1 = 1;
   
-  // if(z>255)
-  //   z-=255;
-
   if(z!=0) {
     for (i = 1; i <= z; i++) {
       pinit = p8;
@@ -92,29 +89,15 @@ int gexp(__attribute__((unused)) struct rscode_driver * driver, int z)
   return ret;
 }
 
-// static int glog(struct rscode_driver * driver, int value)
-// {
-//   int z;
-//   int ret = 0;
-
-//   for (z = 0; z < 256; z++) {
-//     if (gexp(driver,z) == value) {
-//       ret = z;
-//       break;
-//     }
-//   }
-
-//   return ret;
-// }
-
 int gmult(__attribute__((unused)) struct rscode_driver * driver, int x, int y)
 {
-  if (x==0 || y == 0) return (0);
   int prod;
   int i, j, ind;
   int k;
   int scratch[8];
-  int w = 8;
+  int w;
+  if (x==0 || y == 0) return (0);
+  w = 8;
 
   prod = 0;
   for (i = 0; i < w; i++) {
@@ -211,6 +194,5 @@ int galois_shift_inverse(int y)
 int ginv (__attribute__((unused)) struct rscode_driver * driver, int elt) 
 {
   return galois_shift_inverse(elt);
-  // return (gexp(driver,255-glog(driver,elt)));
 }
 

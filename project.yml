@@ -31,12 +31,69 @@
 :flags:
   :test:
     :compile:
-      :*:       # add '--O1' to compilation of main.c as part of test builds including main.c
+      :ecc:
+        - -std=c89
+        - -Wall
+        - -Wextra
+        - -pedantic
+        - -Werror
+      :berlekamp:
+        - -std=c89
+        - -Wall
+        - -Wextra
+        - -pedantic
+        - -Werror
+      :galois:
+        - -std=c89
+        - -Wall
+        - -Wextra
+        - -pedantic
+        - -Werror
+      :rs:
+        - -std=c89
+        - -Wall
+        - -Wextra
+        - -pedantic
+        - -Werror
+      :test_*:       # add '--O1' to compilation of main.c as part of test builds including main.c
         - -std=c99
+        - -Wall
+        - -Wextra
+        - -pedantic
+        - -Werror
   :gcov:
     :compile:
-      :*:       # add '--O1' to compilation of main.c as part of test builds including main.c
+    :compile:
+      :ecc:
+        - -std=c89
+        - -Wall
+        - -Wextra
+        - -pedantic
+        - -Werror
+      :berlekamp:
+        - -std=c89
+        - -Wall
+        - -Wextra
+        - -pedantic
+        - -Werror
+      :galois:
+        - -std=c89
+        - -Wall
+        - -Wextra
+        - -pedantic
+        - -Werror
+      :rs:
+        - -std=c89
+        - -Wall
+        - -Wextra
+        - -pedantic
+        - -Werror
+      :test_*:       # add '--O1' to compilation of main.c as part of test builds including main.c
         - -std=c99
+        - -Wall
+        - -Wextra
+        - -pedantic
+        - -Werror
 
 :defines:
   # in order to add common defines:

@@ -56,7 +56,7 @@ extern "C" {
 /****************************************************************/
 
 /* print debugging info */
-// #define DEBUG 1
+/* #define DEBUG 1 */
 
 #ifndef TEST
 
