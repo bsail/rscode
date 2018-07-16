@@ -55,7 +55,7 @@
         - -Wextra
         - -pedantic
         - -Werror
-      :test_*:       # add '--O1' to compilation of main.c as part of test builds including main.c
+      :'test_.+':       # add '--O1' to compilation of main.c as part of test builds including main.c
         - -std=c99
         - -Wall
         - -Wextra
@@ -88,7 +88,7 @@
         - -Wextra
         - -pedantic
         - -Werror
-      :test_*:       # add '--O1' to compilation of main.c as part of test builds including main.c
+      :'test_.+':       # add '--O1' to compilation of main.c as part of test builds including main.c
         - -std=c99
         - -Wall
         - -Wextra
