@@ -24,4 +24,4 @@ void zero_fill_from (unsigned char * buf, int from, int to);
 }
 #endif
 
-#endif // _RS_H
+#endif /* _RS_H */

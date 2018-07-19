@@ -26,11 +26,11 @@
  */
 
 #define RSCODE_INTERNAL
+#include "ecc.h"
 #ifdef DEBUG
 #include <stdio.h>
 #endif
 #include <ctype.h>
-#include "ecc.h"
 #include "galois.h"
 #include "berlekamp.h"
 

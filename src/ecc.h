@@ -49,21 +49,9 @@
 extern "C" {
 #endif
 
+#include "rscode-config.h"
+
 #include <inttypes.h>
-
-#define NPAR 16
-
-/****************************************************************/
-
-/* print debugging info */
-// #define DEBUG 1
-
-#ifndef TEST
-
-/* Disable erasures functions */
-#define RSCODE_DISABLE_ERASURES_FUNCTIONS 1
-
-#endif
 
 #define TRUE  (1)
 #define FALSE (0)

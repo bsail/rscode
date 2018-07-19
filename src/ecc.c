@@ -16,8 +16,9 @@ void rscode_encode(struct rscode_driver * driver, unsigned char *msg, int nbytes
 
 int rscode_decode(struct rscode_driver * driver, unsigned char *data, int nbytes)
 {
+  int ret;
   decode_data(driver, data, nbytes);
-  int ret = check_syndrome (driver);
+  ret = check_syndrome (driver);
   if(ret!=0)
   {
     correct_errors_erasures (driver, data, 
@@ -35,19 +36,19 @@ int rscode_decode(struct rscode_driver * driver, unsigned char *data, int nbytes
 
 int rscode_decode_with_erasures(struct rscode_driver * driver, unsigned char *data, int nbytes, int nerasures, int * erasures)
 {
+  int ret;
   decode_data(driver, data, nbytes);
-  int ret = check_syndrome (driver);
+  ret = check_syndrome (driver);
   if(ret!=0)
   {
-    correct_errors_erasures (driver, data, 
+    int newret = correct_errors_erasures (driver, data, 
            nbytes,
            nerasures, 
            erasures);
+    if(newret==0)
+      ret = newret;
   }
-  #ifdef TEST
-    #pragma message "TODO: corrrect tests for rscode_decode_with_erasures(). Value MUST be returned"
-  #endif
-  // return 1;
+  return ret;
 }
 
 #endif
