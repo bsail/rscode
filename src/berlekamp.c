@@ -36,10 +36,10 @@
  */
 
 #define RSCODE_INTERNAL
+#include "ecc.h"
 #ifdef DEBUG
 #include <stdio.h>
 #endif
-#include "ecc.h"
 #include "rs.h"
 #include "galois.h"
 
@@ -289,7 +289,7 @@ correct_errors_erasures (struct rscode_driver * driver, unsigned char codeword[]
   Find_Roots(driver);
   
 
-  if ((driver->NErrors <= NPAR) && (driver->NErrors > 0)) { 
+  if (((driver->NErrors <= NPAR) && (driver->NErrors > 0))&&(driver->NErasures<=(2*NPAR))) { 
 
     /* first check for illegal error locs */
     for (r = 0; r < driver->NErrors; r++) {
