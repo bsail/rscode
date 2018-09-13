@@ -51,9 +51,10 @@ Get Code
 -----------------
 
 ```bash
-mkdir lepton
-git clone https://github.com/bsail/rscode lepton
-cd lepton
+mkdir rscode
+git clone https://github.com/bsail/rscode rscode
+ceedling upgrade rscode
+cd rscode
 ```
 
 Tests
