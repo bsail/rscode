@@ -49,7 +49,13 @@
 extern "C" {
 #endif
 
+#ifndef ARDUINO
 #include <rscode-config.h>
+#endif
+
+#ifndef NPAR
+#define NPAR 16
+#endif
 
 #include <inttypes.h>
 
