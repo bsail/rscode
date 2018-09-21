@@ -2,5 +2,5 @@
 
 ```shell
 git remote add rscode https://github.com/bsail/rscode
-git subtree push --prefix=lib/lepton rscode master
+git subtree push --prefix=lib/rscode rscode master
 ```
